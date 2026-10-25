@@ -9,7 +9,7 @@ import { fileToGeoJSON } from './importers.js';
 import { projInfo } from '../projections.js';
 
 const BLENDS = [['normal', 'Normal'], ['multiply', 'Multiplicar (sombreado sobre imagen)'], ['screen', 'Trama (aclarar)'], ['overlay', 'Superponer'], ['soft-light', 'Luz suave'], ['darken', 'Oscurecer'], ['lighten', 'Aclarar']];
-const CLIPS = [['none', 'Sin recorte'], ['inside', 'Solo dentro del Sector Antártico Argentino'], ['outside', 'Solo fuera del Sector Antártico Argentino']];
+const CLIPS = [['none', 'Sin recorte'], ['land', 'Solo sobre tierra y hielo (según la costa SCAR ADD)'], ['inside', 'Solo dentro del Sector Antártico Argentino'], ['outside', 'Solo fuera del Sector Antártico Argentino']];
 
 function typeBadge(def, ls) {
   if (ls.def === 'user') return 'Propia';

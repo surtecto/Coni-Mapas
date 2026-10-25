@@ -30,7 +30,7 @@ export function newLayerState(defId, over = {}) {
     opacity: d.opacity == null ? 1 : d.opacity,
     blend: 'normal',
     adjust: { brightness: 100, contrast: 100, saturate: 100, grayscale: 0 },
-    clip: 'none',
+    clip: d.clip || 'none',
     style: d.style ? deepClone(d.style) : null,
     params: d.params ? deepClone(d.params) : {},
     legend: { show: def.kind === 'vector' && def.type !== 'esri-feature' && !def.labelsOnly && defId !== 'ne-paises', label: def.name },

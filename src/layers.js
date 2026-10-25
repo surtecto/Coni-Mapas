@@ -385,12 +385,49 @@ function buildUserLayer(ls, mctx) {
 }
 
 // ---------- recorte por Sector Antártico ----------
+function landClipPath(ctx, e, mctx) {
+  // recorta a los polígonos de la costa SCAR ADD presentes en este mapa
+  let src = null;
+  for (const [uid, l] of mctx.olLayers) {
+    const st = mctx.getLayerState(uid);
+    if (st && st.def === 'add-costa' && l.getSource) { src = l.getSource(); break; }
+  }
+  if (!src) return false;
+  const c2p = e.frameState.coordinateToPixelTransform;
+  const inv = e.inversePixelTransform;
+  const toPx = (c) => {
+    const x = c2p[0] * c[0] + c2p[2] * c[1] + c2p[4], y = c2p[1] * c[0] + c2p[3] * c[1] + c2p[5];
+    return [inv[0] * x + inv[2] * y + inv[4], inv[1] * x + inv[3] * y + inv[5]];
+  };
+  ctx.beginPath();
+  const feats = src.getFeaturesInExtent(e.frameState.extent);
+  for (const f of feats) {
+    const g = f.getGeometry();
+    if (!g) continue;
+    const polys = g.getType() === 'MultiPolygon' ? g.getCoordinates() : g.getType() === 'Polygon' ? [g.getCoordinates()] : [];
+    for (const poly of polys) {
+      for (const ring of poly) {
+        ring.forEach((c, i) => { const p = toPx(c); if (i === 0) ctx.moveTo(p[0], p[1]); else ctx.lineTo(p[0], p[1]); });
+        ctx.closePath();
+      }
+    }
+  }
+  ctx.clip('evenodd');
+  return true;
+}
+
 function attachClip(layer, ls, mctx) {
   layer.on('prerender', (e) => {
     const cur = mctx.getLayerState(ls.uid) || ls;
+    layer._clipped = false;
     if (!cur.clip || cur.clip === 'none' || !mctx.map) return;
     const ctx = e.context;
     ctx.save();
+    layer._clipped = true;
+    if (cur.clip === 'land') {
+      if (!landClipPath(ctx, e, mctx)) { ctx.restore(); layer._clipped = false; }
+      return;
+    }
     ctx.beginPath();
     const ring = sectorRingLonLat(mctx.projection);
     ring.forEach((ll, i) => {
@@ -406,9 +443,7 @@ function attachClip(layer, ls, mctx) {
     } else ctx.clip();
   });
   layer.on('postrender', (e) => {
-    const cur = mctx.getLayerState(ls.uid) || ls;
-    if (!cur.clip || cur.clip === 'none' || !mctx.map) return;
-    e.context.restore();
+    if (layer._clipped) { e.context.restore(); layer._clipped = false; }
   });
 }
 
