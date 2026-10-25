@@ -145,15 +145,28 @@ export async function extractPaletteFromImage(src, { k = 8, minShare = 0.012 } =
     });
     return { color: rgbToHex(med), rgb: med, share: g.n / pts.length, x: g.xs / g.n, n: g.n };
   });
-  // Fusiona grupos casi iguales (ΔE < 14)
+  // Descarta tonos oscuros o grises (bordes, barras de error, antialias) y fusiona variantes del mismo matiz
+  const hueOf = ([r, g, b]) => {
+    const R = r / 255, G = g / 255, B = b / 255, mx = Math.max(R, G, B), mn = Math.min(R, G, B), d = mx - mn;
+    if (!d) return 0;
+    let h = mx === R ? ((G - B) / d) % 6 : mx === G ? (B - R) / d + 2 : (R - G) / d + 4;
+    return (h * 60 + 360) % 360;
+  };
+  groups = groups.filter((g) => { const [, sat, l] = rgbToHsl(g.rgb); return l >= 0.2 && l <= 0.9 && sat >= 0.25; });
   groups.sort((a, b) => b.n - a.n);
   const merged = [];
   for (const g of groups) {
-    const m = merged.find((q) => deltaE(q.rgb, g.rgb) < 14);
+    const hg = hueOf(g.rgb);
+    const m = merged.find((q) => {
+      const dh = Math.abs(hueOf(q.rgb) - hg);
+      return deltaE(q.rgb, g.rgb) < 14 || (Math.min(dh, 360 - dh) < 14 && g.n < q.n * 0.3);
+    });
     if (m) { m.x = (m.x * m.n + g.x * g.n) / (m.n + g.n); m.n += g.n; m.share += g.share; }
     else merged.push({ ...g });
   }
-  return merged.filter((g) => g.share >= minShare).sort((a, b) => a.x - b.x);
+  const total = merged.reduce((a, g) => a + g.n, 0) || 1;
+  merged.forEach((g) => { g.share = g.n / total; });
+  return merged.filter((g) => g.share >= Math.max(minShare, 0.03)).sort((a, b) => a.x - b.x);
 }
 
 // ---------- Control de distinguibilidad ----------

@@ -492,9 +492,9 @@ function drawManualSpaced(ctx, line, x, y, lsPx, mode) {
 }
 
 export function drawText(ctx, s, t, pos) {
+  ctx.save();
   const m = textMetrics(ctx, s, t);
   const rot = ((t.rotation || 0) * Math.PI) / 180;
-  ctx.save();
   ctx.translate(pos[0] * s, pos[1] * s);
   if (rot) ctx.rotate(rot);
   const ax = t.align === 'left' ? 0 : t.align === 'right' ? -m.w : -m.w / 2;
@@ -523,8 +523,8 @@ export function drawText(ctx, s, t, pos) {
     ctx.fillStyle = t.color;
     if (m.hasLS || !m.lsPx) ctx.fillText(line, lx * s, ly * s); else drawManualSpaced(ctx, line, lx * s, ly * s, m.lsPx, 'fill');
   });
-  if ('letterSpacing' in ctx) ctx.letterSpacing = '0px';
   ctx.restore();
+  if ('letterSpacing' in ctx) ctx.letterSpacing = '0px';
   // polígono de selección (mm)
   const pad = t.bg && t.bg.show ? t.bg.pad || 1 : 0.6;
   const corners = [[ax - pad, top - pad], [ax + m.w + pad, top - pad], [ax + m.w + pad, top + m.h + pad], [ax - pad, top + m.h + pad]];
@@ -936,6 +936,7 @@ export function drawFrameLabels(ctx, s, geo, state) {
 // ---------- dibujo completo ----------
 export function drawOverlay(ctx, s, geo, state, opts = {}) {
   const hits = opts.hits || null;
+  if ('letterSpacing' in ctx) ctx.letterSpacing = '0px';
   const f = frameRect(state);
   const fps = {};
   // en SVG cada bloque queda en su propio grupo (capa en Illustrator / Inkscape)
@@ -953,6 +954,7 @@ export function drawOverlay(ctx, s, geo, state, opts = {}) {
       hits && hits.push({ kind: 'text', id: t.id, poly, pos });
     }
   });
+  if ('letterSpacing' in ctx) ctx.letterSpacing = '0px';
   if (state.legend.show) group('leyenda', 'Leyenda', () => { const poly = drawLegend(ctx, s, state); if (poly && hits) hits.push({ kind: 'legend', id: 'legend', poly }); });
   if (state.north.show) group('norte', 'Norte', () => { const poly = drawNorth(ctx, s, state.north, geo); if (hits) hits.push({ kind: 'north', id: 'north', poly }); });
   if (state.scalebar.show) group('escala', 'Escala gráfica', () => { const poly = drawScaleBar(ctx, s, state.scalebar, geo); if (poly && hits) hits.push({ kind: 'scale', id: 'scale', poly }); });

@@ -2,15 +2,17 @@
 
 Generador web de **mapas de localización para investigación antártica**, pensado para figuras de artículos científicos: se elige la proyección, las capas oficiales del IGN y las bases polares, se ubican los sitios de estudio con colores tomados de los gráficos estadísticos del trabajo, se agregan zooms en lupa y textos, y se exporta a tamaño de revista (PNG, TIFF, PDF, JPEG o SVG por capas).
 
-**Usar en línea:** https://surtecto.github.io/Coni-Mapas/
+**Usar en línea** (cuando el repositorio esté publicado con GitHub Pages): https://surtecto.github.io/Coni-Mapas/
 
-Funciona en el navegador, sin instalar nada. El proyecto se guarda solo en el navegador y también puede descargarse como archivo `.coni.json`.
+**Usar en la computadora**: abrir `index.html` con Chrome, Edge o Firefox. No hace falta instalar nada; las capas se descargan de sus servidores, así que se necesita conexión a internet.
+
+El proyecto se guarda solo en el navegador y también puede descargarse como archivo `.coni.json`.
 
 ## Qué permite hacer
 
 - **Capas del IGN** en vivo: Argenmap (cinco estilos), bases antárticas argentinas, islas, barreras de hielo, glaciares, cerros, accidentes costeros, áreas protegidas y ZAEP, límites de espacios marítimos, zona económica exclusiva, plataforma continental, zona contigua, límites del Sector Antártico, territorio nacional bicontinental, mar territorial, 200 millas del sector antártico, MDE y curvas de nivel.
-- **Costa antártica SCAR ADD v7.12** (resolución media o alta según la escala), afloramientos rocosos, países de Natural Earth en su versión con punto de vista argentino.
-- **Relieve y batimetría**: sombreado REMA + IBCSO, IBCSO en color, GEBCO (sombreado, color y topografía bajo el hielo), sombreado Esri, Blue Marble y un **DEM analítico** con rampa de color, cotas, azimut y altura del sol a elección.
+- **Costa antártica SCAR ADD v7.12** (resolución media o alta según la escala), estaciones de todos los países (COMNAP) y países de Natural Earth en su versión con punto de vista argentino.
+- **Relieve y batimetría**: modelo de elevación REMA del Polar Geospatial Center (sombreado multidireccional o clásico, hipsometría, pendientes, orientación y curvas de nivel cada 25 m), mapa base polar del Norwegian Polar Institute, GEBCO (sombreado, color y topografía bajo el hielo), sombreado Esri, Blue Marble y un **DEM analítico** con rampa de color, cotas, azimut y altura del sol a elección.
 - **Imágenes satelitales**: mosaico polar de la Antártida (EPSG:3031), imagen mundial Esri, Sentinel-2 sin nubes y MODIS por fecha.
 - **Referencias**: Sector Antártico Argentino (25°O–74°O), paralelo 60°S, Círculo Polar Antártico calculado para el año en curso, toponimia antártica y grilla de coordenadas vectorial con rótulos en el marco.
 - **Proyecciones**: estereográfica polar antártica (EPSG:3031), bicontinental IGN (Lambert acimutal equivalente, 40°S 60°O), Lambert polar sur (EPSG:6932), UTM 20S y 21S, Mercator web y geográficas.
@@ -28,7 +30,9 @@ Funciona en el navegador, sin instalar nada. El proyecto se guarda solo en el na
 |---|---|---|
 | Instituto Geográfico Nacional (IGN) | WMS/WFS `wms.ign.gob.ar` y teselas Argenmap | Citar “Instituto Geográfico Nacional de la República Argentina” |
 | SCAR Antarctic Digital Database v7.12 (BAS) | ArcGIS Feature Service | Gerrish, Fretwell y Cooper (2025) |
-| REMA (Polar Geospatial Center), IBCSO v2, ETOPO1 | Servicio del Norwegian Polar Institute | Howat et al. (2019); Dorschel et al. (2022) |
+| REMA (Polar Geospatial Center) | ImageServer `overlord.pgc.umn.edu` | Howat et al. (2019) |
+| COMNAP Antarctic Facilities | Feature Service del PGC | COMNAP |
+| Norwegian Polar Institute (REMA, IBCSO v2, SCAR ADD) | Mapa base polar | Norwegian Polar Institute |
 | GEBCO Compilation Group | WMS `wms.gebco.net` | GEBCO 2025 Grid |
 | NASA GIBS | WMTS polar y Mercator | NASA Worldview / GIBS |
 | Esri, Earthstar Geographics, Maxar | Teselas ArcGIS Online | Atribución Esri |
@@ -36,7 +40,7 @@ Funciona en el navegador, sin instalar nada. El proyecto se guarda solo en el na
 | Natural Earth | GeoJSON incluido en `data/` | Dominio público |
 | Mapzen / AWS Terrain Tiles | Teselas Terrarium | SRTM, GMTED2010, ETOPO1 |
 
-Los datos de bases antárticas (`data/bases_antarticas_ign.geojson`) son una copia de la capa `ign:bahra_base_antartica` consultada el 25 de octubre de 2026. Los puntos de rotulación de islas derivan de la capa `ign:areas_de_zona_costera_BA030`; los de mares y regiones son posiciones de rotulación, no puntos de medición.
+Los datos de bases antárticas (`data/bases_antarticas_ign.geojson`) son una copia de la capa `ign:bahra_base_antartica` consultada el 25 de octubre de 2026; el régimen permanente o temporario sigue el registro de COMNAP (7 permanentes, 6 temporarias). Los puntos de rotulación de islas derivan de la capa `ign:areas_de_zona_costera_BA030`; los de mares y regiones son posiciones de rotulación, no puntos de medición.
 
 ## Desarrollo
 

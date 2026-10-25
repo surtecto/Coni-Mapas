@@ -563,6 +563,12 @@ class App {
       }
       try { paper.releasePointerCapture(d.pointerId); } catch (err) { /* noop */ }
       if (d.moved) {
+        const r1 = (o, keys) => { if (o) keys.forEach((k) => { if (Number.isFinite(o[k])) o[k] = Math.round(o[k] * 10) / 10; }); };
+        if (d.kind === 'inset' || d.kind === 'inset-resize') r1(this.state.insets.find((x) => x.id === d.id), ['x', 'y', 'w', 'h']);
+        if (d.kind === 'legend') r1(this.state.legend, ['x', 'y']);
+        if (d.kind === 'north') r1(this.state.north, ['x', 'y']);
+        if (d.kind === 'scale') r1(this.state.scalebar, ['x', 'y']);
+        if (d.kind === 'text') r1(this.state.texts.find((x) => x.id === d.id), ['x', 'y']);
         if (d.kind === 'site') this.commit('sites');
         else if (d.kind === 'inset-resize' || d.kind === 'inset') { this.layoutInsets(); this.commit('overlay'); }
         else this.commit('overlay');
