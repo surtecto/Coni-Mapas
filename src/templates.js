@@ -35,7 +35,7 @@ export function templateConi() {
   s.paletteId = 'pinguinos';
   s.sites = [
     { id: uid('S'), name: 'Isla Cerro Nevado', lon: -57.27, lat: -64.48, cats: ['emperador'], label: { show: true, dx: 0, dy: -9, align: 'center' }, note: 'Colonia de pingüino emperador (octubre 2025, n = 7)' },
-    { id: uid('S'), name: 'Península Potter', lon: -58.64, lat: -62.255, cats: ['adelia', 'papua'], label: { show: true, dx: 0, dy: -9, align: 'center' }, note: 'Isla 25 de Mayo (enero 2026; Adelia n = 9, papúa n = 16)' },
+    { id: uid('S'), name: 'Península Potter', lon: -58.64, lat: -62.255, cats: ['adelia', 'papua'], label: { show: true, dx: -6.5, dy: 0, align: 'right' }, note: 'Isla 25 de Mayo (enero 2026; Adelia n = 9, papúa n = 16)' },
   ];
   s.siteStyle.size = 8.5;
   s.siteStyle.multi = 'pie';

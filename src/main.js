@@ -9,6 +9,7 @@ import { renderSitesPanel } from './ui/sitesPanel.js';
 import { renderFigurePanel } from './ui/figurePanel.js';
 import { renderInspector } from './ui/inspector.js';
 import { openExportDialog } from './ui/exportDialog.js';
+import { renderRaster, renderSvg, canvasToPng, canvasToTiff, canvasToPdf, canvasToJpeg } from './exporter.js';
 import { sourcesShort } from './caption.js';
 import { siteSymbolCfg } from './layers.js';
 import { el, clear, debounce, rafThrottle, uid, formatDMS, fmtInt, roundScale, downloadBlob, readFileAs, PT_MM, fmtNum } from './util.js';
@@ -250,6 +251,24 @@ class App {
     this.history.push(serializeState(this.state));
     this.scheduleSave();
     this.toast(`Plantilla cargada: ${t.name}`);
+  }
+
+  // Prueba de exportación en memoria (no descarga nada): devuelve tamaño, peso y teselas fallidas
+  async checkExport(fmt = 'png', dpi = 150) {
+    const t0 = performance.now();
+    if (fmt === 'svg') {
+      const r = await renderSvg(this, dpi);
+      return { fmt, dpi, bytes: r.svg.length, tileErrors: r.tileErrors, ms: Math.round(performance.now() - t0) };
+    }
+    const r = await renderRaster(this, dpi);
+    const enc = { png: () => canvasToPng(r.canvas, dpi), tiff: () => canvasToTiff(r.canvas, dpi), pdf: () => canvasToPdf(r.canvas, this.state), jpeg: () => canvasToJpeg(r.canvas, dpi) }[fmt];
+    const blob = await enc();
+    const th = document.createElement('canvas');
+    const k = 520 / r.W;
+    th.width = Math.round(r.W * k); th.height = Math.round(r.H * k);
+    th.getContext('2d').drawImage(r.canvas, 0, 0, th.width, th.height);
+    this.lastCheck = th.toDataURL('image/jpeg', 0.85);
+    return { fmt, dpi, W: r.W, H: r.H, bytes: blob.size, tileErrors: r.tileErrors, ms: Math.round(performance.now() - t0) };
   }
 
   undo() { const j = this.history.undo(); if (j) { this.state = normalizeState(JSON.parse(j)); this.applyState(); this.scheduleSave(); } }
