@@ -46,10 +46,11 @@ json.dump({'type': 'FeatureCollection', 'name': 'paises_natural_earth_vista_arg'
            'features': feats}, open(os.path.join(OUT, 'paises_ne_vista_arg.geojson'), 'w'), ensure_ascii=False, separators=(',', ':'))
 print('paises', len(feats), os.path.getsize(os.path.join(OUT, 'paises_ne_vista_arg.geojson')))
 
-# Bases antárticas argentinas (IGN, capa ign:bahra_base_antartica, consultada 2026-10-25)
+# Bases antárticas argentinas (IGN, capa ign:bahra_base_antartica, consultada 2026-10-25).
+# Régimen (permanente/temporaria) según el registro de instalaciones de COMNAP (servicio PGC, consultado 2026-10-25).
 bases = [
  ('Base Orcadas', -44.740068, -60.737717, 'Islas del Atlántico Sur', 'Permanente'),
- ('Base Petrel', -56.226983, -63.477733, 'Antártida Argentina', 'Temporaria'),
+ ('Base Petrel', -56.226983, -63.477733, 'Antártida Argentina', 'Permanente'),
  ('Base Brown', -62.870669, -64.895387, 'Antártida Argentina', 'Temporaria'),
  ('Base Melchior', -62.976429, -64.325730, 'Antártida Argentina', 'Temporaria'),
  ('Base Decepción', -60.697678, -62.975664, 'Antártida Argentina', 'Temporaria'),

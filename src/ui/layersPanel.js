@@ -110,6 +110,10 @@ function layerBody(app, ls, def) {
       body.append(field('Fecha de la imagen', inp, 'Verano austral (diciembre a febrero) para iluminación completa del continente.'));
     }
     if (def.type === 'terrarium') body.append(demEditor(app, ls));
+    if (def.type === 'arcgis-image' && def.functions) {
+      if (!ls.params.fn) ls.params.fn = def.functions[0][0];
+      body.append(field('Representación', select(ls.params, 'fn', def.functions, { onChange: () => { ls.rev += 1; app.commit('layers'); } })));
+    }
     body.append(details('Fusión y ajustes de imagen', ls.blend !== 'normal',
       field('Modo de fusión', select(ls, 'blend', BLENDS, { onChange: () => app.commit('layers') })),
       inlineFields(field('Brillo', range(ls.adjust, 'brightness', { min: 40, max: 160, step: 1, onInput: () => app.commit('layers', { history: false }), onChange: () => app.commit('layers'), format: (v) => `${v}%` })),

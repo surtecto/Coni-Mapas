@@ -20,10 +20,11 @@ export function templateConi() {
   s.page = mergeDeep(s.page, { preset: 'custom', widthMM: 180, heightMM: 200, margins: { top: 6, right: 6, bottom: 9, left: 10 }, background: '#ffffff', frame: { show: true, color: '#1d1d1d', width: 0.6 } });
   s.projection = 'EPSG:3031';
   s.view = { center: [-58.6, -64.6], mpm: 11500, rotation: rotationForMeridian('EPSG:3031', -58) };
+  s.page.background = '#d9e6ec';
   s.layers = [
-    L('npi-relieve'),
-    L('add-costa', { opacity: 0.9 }),
-    L('ne-paises', { style: { polygon: { fill: '#e8e3d6', stroke: '#6f6a5f', strokeWidth: 0.3 }, categorize: { field: 'iso', values: { ARG: '#ddd5c2' } } } }),
+    L('add-costa', { style: { polygon: { fill: '#f7f9fa', stroke: '#43525c', strokeWidth: 0.35 }, categorize: { field: 'surface', values: { land: '#f7f9fa', 'ice shelf': '#e4eef3', 'ice tongue': '#e4eef3', rumple: '#ecf2f5' } } } }),
+    L('rema-relieve', { blend: 'multiply', opacity: 0.55 }),
+    L('ne-paises', { style: { polygon: { fill: '#ece7db', stroke: '#6f6a5f', strokeWidth: 0.3 }, categorize: { field: 'iso', values: { ARG: '#e3dccb' } } } }),
     L('ign-zee', { visible: false }),
     L('ref-sector', { style: { polygon: { stroke: '#2b2b2b', strokeWidth: 0.7, dash: 'dashed' } }, legend: { show: true, label: 'Sector Antártico Argentino' } }),
     L('ref-60s', { visible: false }),
@@ -40,7 +41,7 @@ export function templateConi() {
   s.siteStyle.multi = 'pie';
   s.insets = [newInset({
     name: 'Zoom norte de la península', shape: 'circle', x: 92, y: 12, w: 78, h: 78,
-    center: [-57.95, -63.37], mpm: 4300, bg: '#d4e2e8',
+    center: [-57.95, -63.37], mpm: 4300, bg: '#d9e6ec',
     border: { color: '#1d1d1d', width: 0.7, dash: 'dashed' },
     connector: { type: 'tangent', color: '#1d1d1d', width: 0.6, dash: 'dashed' },
     footprint: { show: true, color: '#1d1d1d', width: 0.6, dash: 'dashed', fill: '#ffffff', fillOpacity: 0 },
@@ -146,7 +147,8 @@ export function templateBlank() {
   s.projection = 'EPSG:3031';
   s.view = { center: [-58, -66], mpm: 15000, rotation: rotationForMeridian('EPSG:3031', -58) };
   s.page = mergeDeep(s.page, { margins: { top: 5, right: 5, bottom: 8, left: 9 } });
-  s.layers = [L('npi-relieve'), L('add-costa'), L('ref-sector'), L('graticule')];
+  s.page.background = '#d9e6ec';
+  s.layers = [L('add-costa'), L('rema-relieve', { blend: 'multiply', opacity: 0.6 }), L('ref-sector'), L('graticule')];
   s.legend.x = 14; s.legend.y = 12;
   s.north = mergeDeep(s.north, { x: 160, y: 20 });
   s.scalebar = mergeDeep(s.scalebar, { x: 16, y: 164 });

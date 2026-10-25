@@ -8,12 +8,14 @@ import TileArcGISRest from 'ol/source/TileArcGISRest.js';
 import VectorSource from 'ol/source/Vector.js';
 import RasterSource from 'ol/source/Raster.js';
 import TileGrid from 'ol/tilegrid/TileGrid.js';
+import { createXYZ, extentFromProjection } from 'ol/tilegrid.js';
 import GeoJSON from 'ol/format/GeoJSON.js';
 import EsriJSON from 'ol/format/EsriJSON.js';
 import { bbox as bboxStrategy } from 'ol/loadingstrategy.js';
 import { transformExtent } from 'ol/proj.js';
 import { getRenderPixel } from 'ol/render.js';
 import { getDef, RAMPS } from './catalog.js';
+import { EMBEDDED } from './embedded.js';
 import { makeVectorStyleFn } from './styles.js';
 import { hexToRgb } from './util.js';
 import { lonLatTo, metersPerUnit } from './projections.js';
@@ -24,6 +26,7 @@ const esrijson = new EsriJSON();
 // ---------- caché de datos ----------
 const dataCache = new Map(); // url -> Promise<GeoJSON object>
 export function fetchGeoJSON(url) {
+  if (EMBEDDED[url]) return Promise.resolve(EMBEDDED[url]);
   if (!dataCache.has(url)) {
     const p = fetch(url).then((r) => {
       if (!r.ok) throw new Error(`HTTP ${r.status}`);
@@ -144,12 +147,25 @@ function getRasterSource(ls, def, mctx) {
     }
     return rasterSources.get(key);
   }
+  if (def.type === 'arcgis-image') {
+    const reqProj = /^EPSG:(3031|3857|6932|32720|32721)$/.test(mapProj) ? mapProj : 'EPSG:3031';
+    const fn = (ls.params && ls.params.fn) || def.functions[0][0];
+    const key = cacheKey(ls, `img|${reqProj}|${fn}`);
+    if (!rasterSources.has(key)) {
+      rasterSources.set(key, new TileArcGISRest({
+        url: def.url, params: { renderingRule: JSON.stringify({ rasterFunction: fn }), format: 'png32', interpolation: 'RSP_BilinearInterpolation' }, projection: reqProj,
+        crossOrigin: 'anonymous', attributions: def.attribution, transition: 0,
+        tileGrid: createXYZ({ extent: extentFromProjection(reqProj), tileSize: 512, maxZoom: 22 }),
+      }));
+    }
+    return rasterSources.get(key);
+  }
   if (def.type === 'arcgis') {
     const reqProj = /^EPSG:(3031|3857|6932|32720|32721)$/.test(mapProj) ? mapProj : 'EPSG:3031';
     const key = cacheKey(ls, `arcgis|${reqProj}`);
     if (!rasterSources.has(key)) {
       rasterSources.set(key, new TileArcGISRest({
-        url: def.url, params: { ...def.params, FORMAT: 'png32', TRANSPARENT: true }, projection: reqProj,
+        url: def.url, params: { ...def.params }, projection: reqProj,
         crossOrigin: 'anonymous', attributions: def.attribution, transition: 0,
       }));
     }
@@ -272,6 +288,10 @@ function getStaticVectorSource(ls, def, mctx) {
   let key, factory;
   if (def.type === 'geojson') { key = `${def.url}|${proj}`; factory = () => fetchGeoJSON(def.url); }
   else if (def.type === 'wfs') { const u = wfsUrl(def); key = `${u}|${proj}`; factory = () => fetchGeoJSON(u); }
+  else if (def.type === 'geojson-multi') {
+    key = `${def.id}|${proj}`;
+    factory = () => Promise.all(def.urls.map((u) => fetchGeoJSON(u))).then((arr) => ({ type: 'FeatureCollection', features: arr.flatMap((g) => g.features || []) }));
+  }
   else if (def.type === 'generated') { key = `gen:${def.gen}|${proj}`; factory = () => Promise.resolve(generatedGeoJSON(def.gen, proj)); }
   else return null;
   if (!vectorSources.has(key)) vectorSources.set(key, vectorSourceFromPromise(factory, proj, (e) => mctx.onLayerError && mctx.onLayerError(ls, e)));

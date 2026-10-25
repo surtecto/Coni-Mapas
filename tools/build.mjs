@@ -13,6 +13,7 @@ await build({
   outfile: 'assets/app.js',
   logLevel: 'info',
   legalComments: 'none',
+  loader: { '.geojson': 'json' },
 });
 copyFileSync('src/app.css', 'assets/app.css');
 copyFileSync('node_modules/ol/ol.css', 'assets/ol.css');

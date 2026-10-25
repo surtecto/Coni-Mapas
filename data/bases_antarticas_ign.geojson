@@ -23,7 +23,7 @@
 "properties": {
 "nombre": "Base Petrel",
 "departamento": "Antártida Argentina",
-"regimen": "Temporaria",
+"regimen": "Permanente",
 "fuente": "IGN"
 },
 "geometry": {
