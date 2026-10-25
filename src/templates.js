@@ -112,7 +112,7 @@ export function templateModelo2() {
   s.projection = 'CONI:BICONT';
   s.view = { center: [-44, -48], mpm: 36000, rotation: 0 };
   s.layers = [
-    L('ne-paises', { style: { polygon: { fill: '#9ebebb', fillOpacity: 1, stroke: '#c9dad8', strokeWidth: 0.25 }, categorize: { field: 'iso', values: {} } }, legend: { show: false } }),
+    L('ne-paises', { style: { polygon: { fill: '#9ebebb', fillOpacity: 1, stroke: '#c9dad8', strokeWidth: 0.25 }, categorize: { field: '', values: {} } }, legend: { show: false } }),
     L('add-costa', { style: { polygon: { fill: '#6aa39a', fillOpacity: 1, stroke: '#111111', strokeWidth: 0.35 }, categorize: { field: '', values: {} } }, legend: { show: false } }),
   ];
   s.categories = [
