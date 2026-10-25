@@ -1,6 +1,7 @@
 // Compila la aplicación: node tools/build.mjs [--dev]
 import { build } from 'esbuild';
-import { copyFileSync, mkdirSync } from 'node:fs';
+import { copyFileSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { createHash } from 'node:crypto';
 const dev = process.argv.includes('--dev');
 mkdirSync('assets', { recursive: true });
 await build({
@@ -17,4 +18,10 @@ await build({
 });
 copyFileSync('src/app.css', 'assets/app.css');
 copyFileSync('node_modules/ol/ol.css', 'assets/ol.css');
+// versiona los recursos en index.html para que el navegador no use copias viejas
+const v = createHash('sha1').update(readFileSync('assets/app.js')).update(readFileSync('assets/app.css')).digest('hex').slice(0, 10);
+const html = readFileSync('index.html', 'utf8')
+  .replace(/assets\/app\.js(\?v=\w+)?/g, `assets/app.js?v=${v}`)
+  .replace(/assets\/app\.css(\?v=\w+)?/g, `assets/app.css?v=${v}`);
+writeFileSync('index.html', html);
 console.log('ok');
