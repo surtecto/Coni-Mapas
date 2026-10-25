@@ -146,7 +146,7 @@ export const CATALOG = [
     attribution: 'Natural Earth 1:10M', cite: 'Natural Earth (2024). Admin 0 – Countries, 1:10M, versión con punto de vista argentino. https://www.naturalearthdata.com',
     defaults: { style: baseStyle({ polygon: { fill: '#e6e2d8', fillOpacity: 1, stroke: '#7d7a72', strokeWidth: 0.35 },
       categorize: { field: 'iso', values: { ARG: '#d8d2c2' } }, label: { field: 'nombre' } }) },
-    note: 'Incluye Islas Malvinas, Georgias y Sandwich del Sur como territorio argentino (vista ARG de Natural Earth).' },
+    note: 'Sudamérica y alrededores, con Islas Malvinas, Georgias y Sandwich del Sur como territorio argentino (vista ARG de Natural Earth). La Antártida se dibuja con la costa SCAR ADD.' },
 
   // ---------------- Relieve ----------------
   { id: 'rema-relieve', group: 'relieve', name: 'REMA: modelo de elevación de la Antártida', kind: 'raster', type: 'arcgis-image',

@@ -28,7 +28,9 @@ for f in d['features']:
     if g.is_empty:
         continue
     iso = p.get('ADM0_A3_AR') or p.get('ADM0_A3')
-    tol = 0.02 if iso == 'ATA' else 0.006
+    if iso == 'ATA':
+        continue  # la Antártida se dibuja con la costa SCAR ADD, más precisa
+    tol = 0.006
     gs = g.simplify(tol, preserve_topology=True)
     if gs.is_empty:
         continue

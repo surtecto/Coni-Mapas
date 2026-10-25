@@ -53,7 +53,7 @@ export function templateConi() {
     newText({ text: 'Mar de Weddell', anchor: 'geo', lon: -50.5, lat: -69.5, font: 'Source Sans 3', size: 9, italic: true, uppercase: true, letterSpacing: 0.35, color: '#2f6f9f', halo: '#ffffff', haloWidth: 0.8 }),
     newText({ text: 'Pasaje Drake', anchor: 'geo', lon: -66, lat: -58.8, size: 8, italic: true, uppercase: true, letterSpacing: 0.3, color: '#2f6f9f', halo: '#ffffff', haloWidth: 0.8, rotation: -18 }),
     newText({ text: 'Península Antártica', anchor: 'geo', lon: -64.6, lat: -67.6, size: 7, uppercase: true, letterSpacing: 0.22, color: '#33414d', halo: '#ffffff', haloWidth: 0.9, rotation: -62 }),
-    newText({ text: 'Islas Shetland del Sur', anchor: 'geo', lon: -62.3, lat: -61.95, size: 6.5, uppercase: true, letterSpacing: 0.1, color: '#33414d', halo: '#ffffff', haloWidth: 0.8, rotation: -14 }),
+    newText({ text: 'Islas Shetland del Sur', anchor: 'geo', lon: -61.9, lat: -62.55, size: 6.5, uppercase: true, letterSpacing: 0.1, color: '#33414d', halo: '#ffffff', haloWidth: 0.8, rotation: -14 }),
   ];
   s.caption = { figure: 'Figura 1', lead: 'Ubicación de los sitios de muestreo de pingüino emperador (isla Cerro Nevado, octubre de 2025) y de pingüinos Adelia y papúa (península Potter, isla 25 de Mayo, enero de 2026).' };
   return s;
