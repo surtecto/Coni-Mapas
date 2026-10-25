@@ -1,0 +1,214 @@
+{
+"type": "FeatureCollection",
+"name": "bases_antarticas_argentinas_ign",
+"features": [
+{
+"type": "Feature",
+"properties": {
+"nombre": "Base Orcadas",
+"departamento": "Islas del Atlántico Sur",
+"regimen": "Permanente",
+"fuente": "IGN"
+},
+"geometry": {
+"type": "Point",
+"coordinates": [
+-44.740068,
+-60.737717
+]
+}
+},
+{
+"type": "Feature",
+"properties": {
+"nombre": "Base Petrel",
+"departamento": "Antártida Argentina",
+"regimen": "Temporaria",
+"fuente": "IGN"
+},
+"geometry": {
+"type": "Point",
+"coordinates": [
+-56.226983,
+-63.477733
+]
+}
+},
+{
+"type": "Feature",
+"properties": {
+"nombre": "Base Brown",
+"departamento": "Antártida Argentina",
+"regimen": "Temporaria",
+"fuente": "IGN"
+},
+"geometry": {
+"type": "Point",
+"coordinates": [
+-62.870669,
+-64.895387
+]
+}
+},
+{
+"type": "Feature",
+"properties": {
+"nombre": "Base Melchior",
+"departamento": "Antártida Argentina",
+"regimen": "Temporaria",
+"fuente": "IGN"
+},
+"geometry": {
+"type": "Point",
+"coordinates": [
+-62.976429,
+-64.32573
+]
+}
+},
+{
+"type": "Feature",
+"properties": {
+"nombre": "Base Decepción",
+"departamento": "Antártida Argentina",
+"regimen": "Temporaria",
+"fuente": "IGN"
+},
+"geometry": {
+"type": "Point",
+"coordinates": [
+-60.697678,
+-62.975664
+]
+}
+},
+{
+"type": "Feature",
+"properties": {
+"nombre": "Base Primavera",
+"departamento": "Antártida Argentina",
+"regimen": "Temporaria",
+"fuente": "IGN"
+},
+"geometry": {
+"type": "Point",
+"coordinates": [
+-60.954741,
+-64.155832
+]
+}
+},
+{
+"type": "Feature",
+"properties": {
+"nombre": "Base Esperanza",
+"departamento": "Antártida Argentina",
+"regimen": "Permanente",
+"fuente": "IGN"
+},
+"geometry": {
+"type": "Point",
+"coordinates": [
+-56.997122,
+-63.398008
+]
+}
+},
+{
+"type": "Feature",
+"properties": {
+"nombre": "Base Carlini",
+"departamento": "Antártida Argentina",
+"regimen": "Permanente",
+"fuente": "IGN"
+},
+"geometry": {
+"type": "Point",
+"coordinates": [
+-58.667012,
+-62.238467
+]
+}
+},
+{
+"type": "Feature",
+"properties": {
+"nombre": "Base Cámara",
+"departamento": "Antártida Argentina",
+"regimen": "Temporaria",
+"fuente": "IGN"
+},
+"geometry": {
+"type": "Point",
+"coordinates": [
+-59.918406,
+-62.595108
+]
+}
+},
+{
+"type": "Feature",
+"properties": {
+"nombre": "Base Matienzo",
+"departamento": "Antártida Argentina",
+"regimen": "Temporaria",
+"fuente": "IGN"
+},
+"geometry": {
+"type": "Point",
+"coordinates": [
+-60.070946,
+-64.975817
+]
+}
+},
+{
+"type": "Feature",
+"properties": {
+"nombre": "Base Marambio",
+"departamento": "Antártida Argentina",
+"regimen": "Permanente",
+"fuente": "IGN"
+},
+"geometry": {
+"type": "Point",
+"coordinates": [
+-56.625366,
+-64.241142
+]
+}
+},
+{
+"type": "Feature",
+"properties": {
+"nombre": "Base Belgrano II",
+"departamento": "Antártida Argentina",
+"regimen": "Permanente",
+"fuente": "IGN"
+},
+"geometry": {
+"type": "Point",
+"coordinates": [
+-34.679567,
+-77.875514
+]
+}
+},
+{
+"type": "Feature",
+"properties": {
+"nombre": "Base San Martín",
+"departamento": "Antártida Argentina",
+"regimen": "Permanente",
+"fuente": "IGN"
+},
+"geometry": {
+"type": "Point",
+"coordinates": [
+-67.100926,
+-68.129953
+]
+}
+}
+]
+}

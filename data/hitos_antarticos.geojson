@@ -1,0 +1,510 @@
+{
+"type": "FeatureCollection",
+"name": "hitos_antarticos",
+"features": [
+{
+"type": "Feature",
+"properties": {
+"nombre": "Polo Sur",
+"clase": "polo"
+},
+"geometry": {
+"type": "Point",
+"coordinates": [
+0.0,
+-90.0
+]
+}
+},
+{
+"type": "Feature",
+"properties": {
+"nombre": "Mar de Weddell",
+"clase": "mar"
+},
+"geometry": {
+"type": "Point",
+"coordinates": [
+-42.0,
+-72.5
+]
+}
+},
+{
+"type": "Feature",
+"properties": {
+"nombre": "Mar de Bellingshausen",
+"clase": "mar"
+},
+"geometry": {
+"type": "Point",
+"coordinates": [
+-84.0,
+-71.0
+]
+}
+},
+{
+"type": "Feature",
+"properties": {
+"nombre": "Mar de la Flota",
+"clase": "mar"
+},
+"geometry": {
+"type": "Point",
+"coordinates": [
+-42.0,
+-61.5
+]
+}
+},
+{
+"type": "Feature",
+"properties": {
+"nombre": "Pasaje Drake",
+"clase": "pasaje"
+},
+"geometry": {
+"type": "Point",
+"coordinates": [
+-64.0,
+-58.5
+]
+}
+},
+{
+"type": "Feature",
+"properties": {
+"nombre": "Estrecho de Bransfield",
+"clase": "estrecho"
+},
+"geometry": {
+"type": "Point",
+"coordinates": [
+-59.3,
+-63.0
+]
+}
+},
+{
+"type": "Feature",
+"properties": {
+"nombre": "Estrecho Antártico",
+"clase": "estrecho"
+},
+"geometry": {
+"type": "Point",
+"coordinates": [
+-56.6,
+-63.35
+]
+}
+},
+{
+"type": "Feature",
+"properties": {
+"nombre": "Estrecho de Gerlache",
+"clase": "estrecho"
+},
+"geometry": {
+"type": "Point",
+"coordinates": [
+-62.2,
+-64.5
+]
+}
+},
+{
+"type": "Feature",
+"properties": {
+"nombre": "Península Antártica",
+"clase": "peninsula"
+},
+"geometry": {
+"type": "Point",
+"coordinates": [
+-64.5,
+-68.5
+]
+}
+},
+{
+"type": "Feature",
+"properties": {
+"nombre": "Península Potter",
+"clase": "peninsula"
+},
+"geometry": {
+"type": "Point",
+"coordinates": [
+-58.66,
+-62.25
+]
+}
+},
+{
+"type": "Feature",
+"properties": {
+"nombre": "Bahía Esperanza",
+"clase": "bahia"
+},
+"geometry": {
+"type": "Point",
+"coordinates": [
+-57.0,
+-63.4
+]
+}
+},
+{
+"type": "Feature",
+"properties": {
+"nombre": "Bahía Margarita",
+"clase": "bahia"
+},
+"geometry": {
+"type": "Point",
+"coordinates": [
+-68.3,
+-68.4
+]
+}
+},
+{
+"type": "Feature",
+"properties": {
+"nombre": "Islas Shetland del Sur",
+"clase": "archipielago"
+},
+"geometry": {
+"type": "Point",
+"coordinates": [
+-59.8,
+-62.2
+]
+}
+},
+{
+"type": "Feature",
+"properties": {
+"nombre": "Islas Orcadas del Sur",
+"clase": "archipielago"
+},
+"geometry": {
+"type": "Point",
+"coordinates": [
+-45.3,
+-60.65
+]
+}
+},
+{
+"type": "Feature",
+"properties": {
+"nombre": "Islas Malvinas",
+"clase": "archipielago"
+},
+"geometry": {
+"type": "Point",
+"coordinates": [
+-59.5,
+-51.75
+]
+}
+},
+{
+"type": "Feature",
+"properties": {
+"nombre": "Islas Georgias del Sur",
+"clase": "archipielago"
+},
+"geometry": {
+"type": "Point",
+"coordinates": [
+-36.6,
+-54.4
+]
+}
+},
+{
+"type": "Feature",
+"properties": {
+"nombre": "Islas Sandwich del Sur",
+"clase": "archipielago"
+},
+"geometry": {
+"type": "Point",
+"coordinates": [
+-26.5,
+-57.8
+]
+}
+},
+{
+"type": "Feature",
+"properties": {
+"nombre": "Isla Cerro Nevado",
+"clase": "isla"
+},
+"geometry": {
+"type": "Point",
+"coordinates": [
+-57.182,
+-64.451
+]
+}
+},
+{
+"type": "Feature",
+"properties": {
+"nombre": "Isla Vicecomodoro Marambio",
+"clase": "isla"
+},
+"geometry": {
+"type": "Point",
+"coordinates": [
+-56.74,
+-64.266
+]
+}
+},
+{
+"type": "Feature",
+"properties": {
+"nombre": "Isla 25 de Mayo",
+"clase": "isla"
+},
+"geometry": {
+"type": "Point",
+"coordinates": [
+-58.304,
+-62.076
+]
+}
+},
+{
+"type": "Feature",
+"properties": {
+"nombre": "Isla Decepción",
+"clase": "isla"
+},
+"geometry": {
+"type": "Point",
+"coordinates": [
+-60.624,
+-62.957
+]
+}
+},
+{
+"type": "Feature",
+"properties": {
+"nombre": "Isla Ross",
+"clase": "isla"
+},
+"geometry": {
+"type": "Point",
+"coordinates": [
+-57.759,
+-64.114
+]
+}
+},
+{
+"type": "Feature",
+"properties": {
+"nombre": "Isla Vega",
+"clase": "isla"
+},
+"geometry": {
+"type": "Point",
+"coordinates": [
+-57.377,
+-63.86
+]
+}
+},
+{
+"type": "Feature",
+"properties": {
+"nombre": "Isla Joinville",
+"clase": "isla"
+},
+"geometry": {
+"type": "Point",
+"coordinates": [
+-55.797,
+-63.281
+]
+}
+},
+{
+"type": "Feature",
+"properties": {
+"nombre": "Isla Paulet",
+"clase": "isla"
+},
+"geometry": {
+"type": "Point",
+"coordinates": [
+-55.777,
+-63.579
+]
+}
+},
+{
+"type": "Feature",
+"properties": {
+"nombre": "Isla Dundee",
+"clase": "isla"
+},
+"geometry": {
+"type": "Point",
+"coordinates": [
+-55.987,
+-63.491
+]
+}
+},
+{
+"type": "Feature",
+"properties": {
+"nombre": "Isla Laurie",
+"clase": "isla"
+},
+"geometry": {
+"type": "Point",
+"coordinates": [
+-44.604,
+-60.725
+]
+}
+},
+{
+"type": "Feature",
+"properties": {
+"nombre": "Isla Coronación",
+"clase": "isla"
+},
+"geometry": {
+"type": "Point",
+"coordinates": [
+-45.592,
+-60.625
+]
+}
+},
+{
+"type": "Feature",
+"properties": {
+"nombre": "Isla Livingston",
+"clase": "isla"
+},
+"geometry": {
+"type": "Point",
+"coordinates": [
+-60.511,
+-62.608
+]
+}
+},
+{
+"type": "Feature",
+"properties": {
+"nombre": "Isla Elefante",
+"clase": "isla"
+},
+"geometry": {
+"type": "Point",
+"coordinates": [
+-55.064,
+-61.168
+]
+}
+},
+{
+"type": "Feature",
+"properties": {
+"nombre": "Isla Brabante",
+"clase": "isla"
+},
+"geometry": {
+"type": "Point",
+"coordinates": [
+-62.392,
+-64.268
+]
+}
+},
+{
+"type": "Feature",
+"properties": {
+"nombre": "Isla Alejandro I",
+"clase": "isla"
+},
+"geometry": {
+"type": "Point",
+"coordinates": [
+-71.783,
+-70.731
+]
+}
+},
+{
+"type": "Feature",
+"properties": {
+"nombre": "Barrera de hielo Larsen",
+"clase": "barrera"
+},
+"geometry": {
+"type": "Point",
+"coordinates": [
+-62.0,
+-67.5
+]
+}
+},
+{
+"type": "Feature",
+"properties": {
+"nombre": "Barrera de hielo Filchner-Ronne",
+"clase": "barrera"
+},
+"geometry": {
+"type": "Point",
+"coordinates": [
+-61.0,
+-79.0
+]
+}
+},
+{
+"type": "Feature",
+"properties": {
+"nombre": "Tierra de Coats",
+"clase": "region"
+},
+"geometry": {
+"type": "Point",
+"coordinates": [
+-27.0,
+-77.0
+]
+}
+},
+{
+"type": "Feature",
+"properties": {
+"nombre": "Sector Antártico Argentino",
+"clase": "region"
+},
+"geometry": {
+"type": "Point",
+"coordinates": [
+-49.5,
+-75.0
+]
+}
+}
+]
+}

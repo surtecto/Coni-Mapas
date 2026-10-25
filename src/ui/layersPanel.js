@@ -1,0 +1,261 @@
+// Panel de capas: pila ordenable, ajustes por capa y catálogo de fuentes
+import { el, clear, uid } from '../util.js';
+import { field, inlineFields, num, color, select, check, range, button, details, text } from './forms.js';
+import { styleEditor, geomOf } from './styleEditor.js';
+import { CATALOG, GROUPS, getDef, RAMPS, baseStyle, FONTS } from '../catalog.js';
+import { DASH_OPTIONS } from '../styles.js';
+import { newLayerState } from '../state.js';
+import { fileToGeoJSON } from './importers.js';
+import { projInfo } from '../projections.js';
+
+const BLENDS = [['normal', 'Normal'], ['multiply', 'Multiplicar (sombreado sobre imagen)'], ['screen', 'Trama (aclarar)'], ['overlay', 'Superponer'], ['soft-light', 'Luz suave'], ['darken', 'Oscurecer'], ['lighten', 'Aclarar']];
+const CLIPS = [['none', 'Sin recorte'], ['inside', 'Solo dentro del Sector Antártico Argentino'], ['outside', 'Solo fuera del Sector Antártico Argentino']];
+
+function typeBadge(def, ls) {
+  if (ls.def === 'user') return 'Propia';
+  if (def.type === 'wfs') return 'WFS';
+  if (def.type === 'wms') return 'WMS';
+  if (def.type === 'esri-feature') return 'Vector';
+  if (def.kind === 'vector') return 'Vector';
+  if (def.type === 'graticule') return 'Grilla';
+  if (def.projection === 'EPSG:3031') return 'Polar';
+  return 'Teselas';
+}
+
+export function insertIndexFor(state, def) {
+  const layers = state.layers;
+  if (def.kind === 'raster') {
+    let idx = 0;
+    layers.forEach((l, i) => { const d = getDef(l.def); if (d && d.kind === 'raster') idx = i + 1; });
+    return idx;
+  }
+  const g = layers.findIndex((l) => l.def === 'graticule');
+  return g >= 0 ? g : layers.length;
+}
+
+export function renderLayersPanel(app, root) {
+  clear(root);
+  const st = app.state;
+  const stack = el('ol', { class: 'layer-stack', 'aria-label': 'Capas del mapa, de arriba hacia abajo' });
+  const ordered = [...st.layers].reverse();
+  for (const ls of ordered) stack.append(layerRow(app, ls));
+  enableReorder(app, stack);
+  const sitesRow = el('li', { class: 'layer-row fixed' },
+    el('div', { class: 'layer-head' },
+      el('span', { class: 'drag ghost', 'aria-hidden': 'true' }),
+      check(st, 'sitesVisible', '', { onChange: () => app.commit('layers') }),
+      el('span', { class: 'layer-name static' }, 'Sitios de estudio'),
+      el('span', { class: 'badge' }, `${st.sites.length}`)));
+  if (st.sitesVisible === undefined) st.sitesVisible = true;
+  sitesRow.querySelector('input').checked = st.sitesVisible !== false;
+  stack.prepend(sitesRow);
+
+  root.append(
+    el('div', { class: 'panel-intro' },
+      el('p', {}, 'Arrastrá para cambiar el orden: la capa de arriba se dibuja encima. Abrí una capa para ajustar su estilo, opacidad, recorte o visibilidad en los zooms.')),
+    stack,
+    el('h2', { class: 'panel-h' }, 'Agregar capas'),
+    catalogView(app),
+    el('h2', { class: 'panel-h' }, 'Datos propios'),
+    importView(app),
+  );
+}
+
+function layerRow(app, ls) {
+  const def = ls.def === 'user' ? { name: ls.name, kind: 'vector', type: 'user' } : getDef(ls.def);
+  const open = app.ui.expanded.has(ls.uid);
+  const li = el('li', { class: `layer-row${open ? ' open' : ''}${ls.visible ? '' : ' hidden-layer'}`, dataset: { uid: ls.uid } });
+  const vis = el('input', { type: 'checkbox', checked: ls.visible, 'aria-label': `Mostrar ${ls.name}` });
+  vis.addEventListener('change', () => { ls.visible = vis.checked; li.classList.toggle('hidden-layer', !ls.visible); app.commit('layers'); });
+  const nameBtn = el('button', { type: 'button', class: 'layer-name', 'aria-expanded': String(open) }, ls.name);
+  nameBtn.addEventListener('click', () => {
+    if (app.ui.expanded.has(ls.uid)) app.ui.expanded.delete(ls.uid); else app.ui.expanded.add(ls.uid);
+    app.renderLeft();
+  });
+  const op = el('input', { type: 'range', min: 0, max: 1, step: 0.05, value: ls.opacity, class: 'mini-range', 'aria-label': 'Opacidad', title: `Opacidad ${Math.round(ls.opacity * 100)}%` });
+  op.addEventListener('input', () => { ls.opacity = parseFloat(op.value); op.title = `Opacidad ${Math.round(ls.opacity * 100)}%`; app.applyOpacity(ls); });
+  op.addEventListener('change', () => app.commit('layers'));
+  const rm = el('button', { type: 'button', class: 'icon ghost', title: 'Quitar capa', 'aria-label': `Quitar ${ls.name}` }, '×');
+  rm.addEventListener('click', () => { app.state.layers = app.state.layers.filter((l) => l !== ls); app.commit('layers'); app.renderLeft(); });
+  const status = app.layerStatus(ls.uid);
+  li.append(el('div', { class: 'layer-head' },
+    el('span', { class: 'drag', title: 'Arrastrar para reordenar', 'aria-hidden': 'true', draggable: 'true' }),
+    vis, nameBtn,
+    status ? el('span', { class: `badge ${status.kind}`, title: status.text }, status.kind === 'error' ? '!' : '…') : el('span', { class: 'badge' }, typeBadge(def, ls)),
+    op, rm));
+  if (open) li.append(layerBody(app, ls, def));
+  return li;
+}
+
+function layerBody(app, ls, def) {
+  const body = el('div', { class: 'layer-body' });
+  if (def.note) body.append(el('p', { class: 'note' }, def.note));
+  if (def.attribution) body.append(el('p', { class: 'source' }, `Fuente: ${def.attribution}`));
+  body.append(field('Nombre', text(ls, 'name', { onChange: () => { if (ls.legend) ls.legend.label = ls.legend.label || ls.name; app.renderLeft(); app.commit('overlay'); } })));
+  body.append(inlineFields(field('Opacidad', range(ls, 'opacity', { onInput: () => app.applyOpacity(ls), onChange: () => app.commit('layers'), format: (v) => `${Math.round(v * 100)}%` }))));
+
+  if (def.type === 'graticule') body.append(graticuleEditor(app, ls));
+  else if (def.kind === 'vector') {
+    if (ls.style) body.append(styleEditor(app, ls));
+    if (ls.legend) {
+      body.append(details('Leyenda', !!ls.legend.show,
+        check(ls.legend, 'show', 'Incluir en la leyenda', { onChange: () => app.commit('overlay') }),
+        field('Texto en la leyenda', text(ls.legend, 'label', { onChange: () => app.commit('overlay') })),
+      ));
+    }
+  } else {
+    if (def.type === 'gibs-date') {
+      const inp = el('input', { type: 'date', value: ls.params.date, max: new Date().toISOString().slice(0, 10), min: '2000-03-01' });
+      inp.addEventListener('change', () => { ls.params.date = inp.value; ls.rev += 1; app.commit('layers'); });
+      body.append(field('Fecha de la imagen', inp, 'Verano austral (diciembre a febrero) para iluminación completa del continente.'));
+    }
+    if (def.type === 'terrarium') body.append(demEditor(app, ls));
+    body.append(details('Fusión y ajustes de imagen', ls.blend !== 'normal',
+      field('Modo de fusión', select(ls, 'blend', BLENDS, { onChange: () => app.commit('layers') })),
+      inlineFields(field('Brillo', range(ls.adjust, 'brightness', { min: 40, max: 160, step: 1, onInput: () => app.commit('layers', { history: false }), onChange: () => app.commit('layers'), format: (v) => `${v}%` })),
+        field('Contraste', range(ls.adjust, 'contrast', { min: 40, max: 180, step: 1, onInput: () => app.commit('layers', { history: false }), onChange: () => app.commit('layers'), format: (v) => `${v}%` }))),
+      inlineFields(field('Saturación', range(ls.adjust, 'saturate', { min: 0, max: 200, step: 1, onInput: () => app.commit('layers', { history: false }), onChange: () => app.commit('layers'), format: (v) => `${v}%` })),
+        field('Escala de grises', range(ls.adjust, 'grayscale', { min: 0, max: 100, step: 1, onInput: () => app.commit('layers', { history: false }), onChange: () => app.commit('layers'), format: (v) => `${v}%` }))),
+    ));
+  }
+  body.append(field('Recorte geográfico', select(ls, 'clip', CLIPS, { onChange: () => app.commit('layers') })));
+  if (app.state.insets.length) {
+    const box = el('div', { class: 'inset-vis' });
+    for (const z of app.state.insets) {
+      const obj = { v: z.layers[ls.uid] === true ? 'show' : z.layers[ls.uid] === false ? 'hide' : 'inherit' };
+      box.append(field(`En «${z.name}»`, select(obj, 'v', [['inherit', def.type === 'graticule' ? 'Según el zoom' : 'Igual que el mapa'], ['show', 'Mostrar'], ['hide', 'Ocultar']], {
+        onChange: (v) => { if (v === 'inherit') delete z.layers[ls.uid]; else z.layers[ls.uid] = v === 'show'; app.commit('layers'); },
+      })));
+    }
+    body.append(details('Visibilidad en los zooms', false, box));
+  }
+  return body;
+}
+
+function demEditor(app, ls) {
+  const p = ls.params;
+  const ch = () => app.commit('layers');
+  return el('div', { class: 'dem-editor' },
+    field('Rampa de color', select(p, 'ramp', Object.entries(RAMPS).map(([k, r]) => [k, r.name]), { onChange: ch })),
+    inlineFields(field('Cota mínima', num(p, 'min', { step: 100, unit: 'm', onChange: ch })), field('Cota máxima', num(p, 'max', { step: 100, unit: 'm', onChange: ch }))),
+    check(p, 'shade', 'Sombreado del relieve', { onChange: ch }),
+    inlineFields(field('Azimut del sol', num(p, 'azimuth', { min: 0, max: 360, step: 5, unit: '°', onChange: ch })), field('Altura del sol', num(p, 'altitude', { min: 5, max: 85, step: 5, unit: '°', onChange: ch }))),
+    inlineFields(field('Exageración vertical', num(p, 'zFactor', { min: 0.5, max: 20, step: 0.5, unit: '×', onChange: ch })), field('Intensidad', range(p, 'shadeStrength', { min: 0, max: 1, step: 0.05, onChange: ch, format: (v) => `${Math.round(v * 100)}%` }))),
+    check(p, 'transparentSea', 'Mar transparente (solo tierra)', { onChange: ch }),
+  );
+}
+
+function graticuleEditor(app, ls) {
+  const st = ls.style;
+  if (!st.intervalLon) st.intervalLon = 'auto';
+  if (!st.label.edges || st.label.edges === 'all') st.label.edges = st.label.edges || 'classic';
+  const ch = () => app.commit('layers');
+  const intervals = [['auto', 'Automático'], ['45', '45°'], ['30', '30°'], ['20', '20°'], ['15', '15°'], ['10', '10°'], ['5', '5°'], ['2', '2°'], ['1', '1°'], ['0.5', '30′'], ['0.25', '15′'], [String(1 / 6), '10′'], [String(1 / 12), '5′'], [String(1 / 60), '1′']];
+  return el('div', {},
+    el('p', { class: 'note' }, 'La grilla se dibuja como vector por encima de las capas del mapa (queda editable en la exportación SVG).'),
+    inlineFields(field('Paralelos cada', select(st, 'interval', intervals, { onChange: ch })), field('Meridianos cada', select(st, 'intervalLon', intervals, { onChange: ch }))),
+    inlineFields(field('Color', color(st.line, 'color', { onChange: ch })), field('Grosor', num(st.line, 'width', { min: 0.05, max: 3, step: 0.05, unit: 'pt', onChange: ch }))),
+    inlineFields(field('Tipo de línea', select(st.line, 'dash', DASH_OPTIONS, { onChange: ch })), field('Opacidad', range(st.line, 'opacity', { onChange: ch, format: (v) => `${Math.round(v * 100)}%` }))),
+    check(st.label, 'show', 'Rótulos de coordenadas', { onChange: ch }),
+    field('Ubicación de rótulos', select(st.label, 'mode', [['frame', 'Fuera del marco, con marcas'], ['inside', 'Dentro del marco']], { onChange: ch }),
+      'Fuera del marco: dejá márgenes en Figura › Página para que entren.'),
+    field('Qué se rotula', select(st.label, 'edges', [['classic', 'Meridianos arriba y abajo, paralelos a los lados'], ['all', 'Todos los cruces en los cuatro bordes'], ['left-bottom', 'Todos los cruces, solo bordes izquierdo e inferior']], { onChange: ch })),
+    inlineFields(field('Tamaño', num(st.label, 'size', { min: 3, max: 16, step: 0.5, unit: 'pt', onChange: ch })), field('Color', color(st.label, 'color', { onChange: ch }))),
+    field('Tipografía', select(st.label, 'font', FONTS, { onChange: ch })),
+    check(st.label, 'vertical', 'Rótulos verticales en los bordes laterales', { onChange: ch }),
+  );
+}
+
+function enableReorder(app, list) {
+  let dragEl = null;
+  list.addEventListener('dragstart', (e) => {
+    const row = e.target.closest('.layer-row');
+    if (!row || row.classList.contains('fixed')) return;
+    dragEl = row;
+    row.classList.add('dragging');
+    e.dataTransfer.effectAllowed = 'move';
+    try { e.dataTransfer.setData('text/plain', row.dataset.uid); } catch (err) { /* noop */ }
+  });
+  list.addEventListener('dragover', (e) => {
+    if (!dragEl) return;
+    e.preventDefault();
+    const after = [...list.querySelectorAll('.layer-row:not(.dragging):not(.fixed)')].find((r) => {
+      const b = r.getBoundingClientRect();
+      return e.clientY < b.top + b.height / 2;
+    });
+    if (after) list.insertBefore(dragEl, after); else list.appendChild(dragEl);
+  });
+  list.addEventListener('dragend', () => {
+    if (!dragEl) return;
+    dragEl.classList.remove('dragging');
+    dragEl = null;
+    const uids = [...list.querySelectorAll('.layer-row:not(.fixed)')].map((r) => r.dataset.uid).reverse();
+    const byUid = new Map(app.state.layers.map((l) => [l.uid, l]));
+    app.state.layers = uids.map((u) => byUid.get(u)).filter(Boolean);
+    app.commit('layers');
+  });
+}
+
+function catalogView(app) {
+  const wrap = el('div', { class: 'catalog' });
+  const present = new Set(app.state.layers.map((l) => l.def));
+  const proj = projInfo(app.state.projection);
+  for (const g of GROUPS) {
+    const items = CATALOG.filter((d) => d.group === g.id);
+    const list = el('ul', { class: 'catalog-list' });
+    for (const d of items) {
+      const inMap = present.has(d.id);
+      const warn = d.projection === 'EPSG:3857' && proj.polar ? 'Teselas Mercator: sin datos al sur de 85°S.' : '';
+      const add = el('button', { type: 'button', class: `btn small${inMap ? ' ghost' : ''}`, 'aria-label': `Agregar ${d.name}` }, inMap ? 'En el mapa' : 'Agregar');
+      add.addEventListener('click', () => {
+        const ls = newLayerState(d.id);
+        app.state.layers.splice(insertIndexFor(app.state, d), 0, ls);
+        app.ui.expanded.add(ls.uid);
+        app.commit('layers');
+        app.renderLeft();
+        app.toast(`Capa agregada: ${d.name}`);
+      });
+      list.append(el('li', { class: 'catalog-item' },
+        el('div', { class: 'catalog-text' }, el('span', { class: 'catalog-name' }, d.name), d.note || warn ? el('span', { class: 'catalog-note' }, warn || d.note) : null),
+        add));
+    }
+    wrap.append(details(g.title, g.id === 'ign-vec', list));
+  }
+  return wrap;
+}
+
+function importView(app) {
+  const inp = el('input', { type: 'file', accept: '.geojson,.json,.kml,.gpx,.csv,.tsv,.txt,.zip', multiple: true, class: 'file-input', id: 'import-layer-file' });
+  inp.addEventListener('change', async () => {
+    for (const file of inp.files) {
+      try {
+        const results = await fileToGeoJSON(file);
+        for (const r of results) {
+          const n = (r.geojson.features || []).length;
+          if (!n) { app.toast(`«${r.name}» no tiene elementos con geometría.`, 'warn'); continue; }
+          const ls = {
+            uid: uid('L'), def: 'user', name: r.name.replace(/\.(geojson|json|kml|gpx|csv|tsv|txt)$/i, ''), visible: true, opacity: 1, blend: 'normal',
+            adjust: { brightness: 100, contrast: 100, saturate: 100, grayscale: 0 }, clip: 'none',
+            style: baseStyle({ point: { fill: '#7a3fb0' }, line: { color: '#7a3fb0', width: 0.8 }, polygon: { fill: '#7a3fb0', fillOpacity: 0.25, stroke: '#7a3fb0', strokeWidth: 0.6 }, label: { field: '' } }),
+            params: {}, legend: { show: true, label: r.name.replace(/\.[^.]+$/, '') }, insets: {}, rev: 0, _styleVersion: 0, data: r.geojson,
+          };
+          const props = (r.geojson.features.find((f) => f.properties) || {}).properties || {};
+          ls.style.label.field = Object.keys(props).find((k) => /nombre|name|sitio|site/i.test(k)) || Object.keys(props)[0] || '';
+          app.state.layers.splice(app.state.layers.findIndex((l) => l.def === 'graticule') >= 0 ? app.state.layers.findIndex((l) => l.def === 'graticule') : app.state.layers.length, 0, ls);
+          app.ui.expanded.add(ls.uid);
+          app.toast(`Importado: ${ls.name} (${n} elementos, ${geomOf(ls) === 'point' ? 'puntos' : geomOf(ls) === 'line' ? 'líneas' : 'polígonos'})`);
+        }
+      } catch (err) {
+        app.toast(`No se pudo importar «${file.name}»: ${err.message}`, 'error');
+      }
+    }
+    inp.value = '';
+    app.commit('layers');
+    app.renderLeft();
+  });
+  return el('div', { class: 'import-box' },
+    el('label', { class: 'drop', for: 'import-layer-file' },
+      el('strong', {}, 'Elegir archivos'),
+      el('span', {}, 'GeoJSON, KML, GPX, CSV con latitud/longitud o Shapefile comprimido (.zip). Coordenadas WGS 84.')),
+    inp);
+}
